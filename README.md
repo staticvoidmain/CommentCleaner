@@ -6,18 +6,10 @@ Originated as a work project which did not get much traction, so I decided to bl
 
 Commented code is a blight on large code bases, so lets kill it.
 
-## Syntax
+## Intended Syntax
 
-
-Just report.
-'''bash
 CommentCleaner.exe --dir=c:\dev --report-style=xml --out=report.xml --verbose
-'''
-
-Kill and report.
-'''bash
 CommentCleaner.exe --dir=c:\dev --kill --report-style=text --out=report.txt
-'''
 
 ## Future
 
