@@ -9,6 +9,7 @@ Commented code is a blight on large code bases, so lets kill it.
 ## Intended Syntax
 
 CommentCleaner.exe --dir=c:\dev --report-style=xml --out=report.xml --verbose
+
 CommentCleaner.exe --dir=c:\dev --kill --report-style=text --out=report.txt
 
 ## Future
