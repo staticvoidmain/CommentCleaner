@@ -1,6 +1,0 @@
-C:\development\CommentCleaner\bin\Debug\CommentCleaner.exe.config
-C:\development\CommentCleaner\bin\Debug\CommentCleaner.exe
-C:\development\CommentCleaner\bin\Debug\CommentCleaner.pdb
-C:\development\CommentCleaner\obj\x86\Debug\CommentCleaner.csprojResolveAssemblyReference.cache
-C:\development\CommentCleaner\obj\x86\Debug\CommentCleaner.exe
-C:\development\CommentCleaner\obj\x86\Debug\CommentCleaner.pdb

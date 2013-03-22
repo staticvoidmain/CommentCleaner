@@ -1,9 +1,0 @@
-C:\development\CommentCleaner\Tests\obj\Debug\Tests.csprojResolveAssemblyReference.cache
-C:\development\CommentCleaner\Tests\bin\Debug\Tests.dll
-C:\development\CommentCleaner\Tests\bin\Debug\Tests.pdb
-C:\development\CommentCleaner\Tests\bin\Debug\CommentCleaner.exe
-C:\development\CommentCleaner\Tests\bin\Debug\nunit.framework.dll
-C:\development\CommentCleaner\Tests\bin\Debug\CommentCleaner.pdb
-C:\development\CommentCleaner\Tests\bin\Debug\nunit.framework.xml
-C:\development\CommentCleaner\Tests\obj\Debug\Tests.dll
-C:\development\CommentCleaner\Tests\obj\Debug\Tests.pdb
