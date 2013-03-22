@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRecord xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Tests>
+    <TestRecord Name="Tests">
+      <Tests>
+        <TestRecord Name="ProgramTests">
+          <Tests>
+            <TestRecord Name="Main_When_Directory_Not_Specified_Throws_Exception">
+              <Results>
+                <UnitTestResult>
+                  <TestDate>2013-03-19T22:33:06</TestDate>
+                  <Passed>0</Passed>
+                  <Errors>0</Errors>
+                  <Failures>1</Failures>
+                  <Inconclusive>0</Inconclusive>
+                  <NotRunnable>0</NotRunnable>
+                  <Skipped>0</Skipped>
+                  <Ignored>0</Ignored>
+                  <Time />
+                  <Message>  Expected: &lt;System.Exception&gt;
+  But was:  &lt;System.BadImageFormatException&gt; (Could not load file or assembly 'CommentCleaner, Version=1.0.4826.38479, Culture=neutral, PublicKeyToken=null' or one of its dependencies. An attempt was made to load a program with an incorrect format.)
+   at Tests.ProgramTests.&lt;&gt;c__DisplayClass1.&lt;Main_When_Directory_Not_Specified_Throws_Exception&gt;b__0()
+   at NUnit.Framework.Assert.Throws(IResolveConstraint expression, TestDelegate code, String message, Object[] args)
+</Message>
+                  <StackTrace>   at NUnit.Framework.Assert.Throws(IResolveConstraint expression, TestDelegate code, String message, Object[] args)
+   at NUnit.Framework.Assert.Throws[T](TestDelegate code, String message, Object[] args)
+   at NUnit.Framework.Assert.Throws[T](TestDelegate code)
+   at Tests.ProgramTests.Main_When_Directory_Not_Specified_Throws_Exception() in c:\development\CommentCleaner\Tests\Test.cs:line 37</StackTrace>
+                  <ConsoleOutput />
+                  <ConsoleError />
+                </UnitTestResult>
+              </Results>
+            </TestRecord>
+          </Tests>
+        </TestRecord>
+      </Tests>
+    </TestRecord>
+  </Tests>
+</TestRecord>
