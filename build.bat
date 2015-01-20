@@ -1,0 +1,1 @@
+msbuild .\CommentCleaner.sln /t:Build /p:Configuration=Debug /p:AllowUnsafeBlocks=true /p:Platform="Any CPU"
