@@ -1,8 +1,3 @@
-using System;
-using Mono.Options;
-using System.Text.RegularExpressions;
-using System.IO;
-
 namespace CommentCleaner
 {
 	public class Program
@@ -11,7 +6,7 @@ namespace CommentCleaner
 		{
 			var processor = new ConsoleProcessor();
 
-			processor.ProcessArgs(args);
+			processor.ProcessArgs(args).Wait();
 		}
 	}
 }

@@ -7,6 +7,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using CommentCleaner.Languages;
 using System.Diagnostics;
+using System.Text;
 
 namespace CommentCleaner
 {
@@ -38,7 +39,7 @@ namespace CommentCleaner
 
 			this._options = new OptionSet()
 			{
-				{ "d=|dir=", "Directory to begin parsing.", (dir) => _directory = dir },
+				{ "d=|directory=", "Directory to begin parsing.", (dir) => _directory = dir },
 				{ "m=|mode=", "Program Mode (Profile|Report|Kill)", mode => ParseProgramMode(mode) }, 
 				{ "l|language=", "Language to use.", lang => _language = lang },
 				{ "v:|verbose:", "Output verbose rule information.", (verbose) => _verbose = bool.Parse(verbose) },
@@ -69,7 +70,7 @@ namespace CommentCleaner
 			}
 		}
 
-		public void ProcessArgs(string[] args)
+		public async Task ProcessArgs(string[] args)
 		{
 			if (args.Length == 0)
 			{
@@ -84,67 +85,87 @@ namespace CommentCleaner
 					if (ValidateOptions())
 					{
 						var watch = Stopwatch.StartNew();
-						
+
 						Language language = LanguageFactory.CreateLanguage(_language);
 
-						using (BlockingCollection<string> files = new BlockingCollection<string>(new ConcurrentQueue<string>(), 500))
+						const int bufferSize = 1024 * 8;
+						bool done = false;
+						const int parserThreads = 8;
+						ConcurrentQueue<string>[] buckets = InitializeQueueTiles(parserThreads);
+
+						var producer = Task.Factory.StartNew(() =>
 						{
-							// producer
-							Task producer = Task.Run(() =>
+							int index = 0;
+
+							foreach (var file in Directory.EnumerateFiles(_directory, language.Pattern, SearchOption.AllDirectories))
 							{
-								foreach (var file in Directory.EnumerateFiles(_directory, language.Pattern, SearchOption.AllDirectories))
+								if (_ignorePattern == null || _ignorePattern.IsMatch(file) == false)
 								{
-									if (_ignorePattern == null || _ignorePattern.IsMatch(file) == false)
-									{
-										// todo: signal that we're ready to start processing?
-										files.Add(file);
-									}
+									var tile = buckets[index++ % parserThreads];
+
+									tile.Enqueue(file);
 								}
-
-								files.CompleteAdding();
-							});
-
-							const int parserThreads = 8;
-
-							Task[] consumers = new Task[parserThreads];
-							Parser parser = language.Parser;
-							const int bufferSize = 1024 * 8;
-
-							for (int i = 0; i < parserThreads; i++)
-							{
-								consumers[i] = Task.Run(async () =>
-								{
-									while (!files.IsCompleted)
-									{
-										// should this be tryTake?
-										string file = files.Take();
-
-										var document = new Document(file);
-
-										using (var sr = new StreamReader(file, true))
-										{
-											char[] buffer = new char[bufferSize];
-
-											while (true)
-											{
-												int bytesRead = await sr.ReadBlockAsync(buffer, 0, bufferSize).ConfigureAwait(false);
-
-												if (bytesRead == 0)
-													break;
-
-												parser.ParseChunk(document, buffer);
-											}
-										}
-									}
-								});
 							}
 
-							Task.WaitAll(producer);
-							Task.WaitAll(consumers);
+							done = true;
+						});
 
-							watch.Stop();
-							_out.WriteLine("elapsed: " + watch.ElapsedMilliseconds + "ms");
+						Task[] consumers = new Task[parserThreads];
+						Parser parser = language.Parser;
+
+						for (int i = 0; i < parserThreads; i++)
+						{
+							var tile = buckets[i];
+
+							consumers[i] = Task.Factory.StartNew(async () =>
+							{
+								while (!done)
+								{
+									string file;
+
+									if (!tile.TryDequeue(out file))
+										continue;
+
+									Document document = new Document(file);
+
+									using (var sr = new StreamReader(file, Encoding.UTF8, true, bufferSize))
+									{
+										char[] buffer = new char[bufferSize];
+
+										while (true)
+										{
+											int bytesRead = await sr.ReadBlockAsync(buffer, 0, bufferSize).ConfigureAwait(false);
+
+											if (bytesRead == 0)
+												break;
+
+											// todo: pass bytesRead into the parser?
+											// maybe the bounds check would get eliminated?
+											parser.ParseChunk(document, buffer, (comment) =>
+											{
+												var result = TextAnalyzer.Analyze(comment.Text);
+
+												double score = Score(comment, result);
+
+												if (score > 0)
+												{
+													lock (_out)
+													{
+														_out.WriteLine(comment.Text + " Score: " + score.ToString());
+													}
+												}
+											});
+										}
+									}
+								}
+							}, TaskCreationOptions.PreferFairness);
 						}
+
+						await producer;
+						await Task.WhenAll(consumers);
+
+						watch.Stop();
+						_out.WriteLine("elapsed: " + watch.ElapsedMilliseconds + "ms");
 					}
 				}
 				else
@@ -157,9 +178,61 @@ namespace CommentCleaner
 			}
 
 			_out.WriteLine();
-
 			_error.Flush();
 			_out.Flush();
+		}
+
+		private static ConcurrentQueue<string>[] InitializeQueueTiles(int tiles)
+		{
+			ConcurrentQueue<string>[] buckets = new ConcurrentQueue<string>[tiles];
+
+			for (int tileIndex = 0; tileIndex < tiles; tileIndex++)
+			{
+				buckets[tileIndex] = new ConcurrentQueue<string>();
+			}
+
+			return buckets;
+		}
+
+		private double Score(Comment comment, TextAnalyzer.AnalysisResult result)
+		{
+			double score = 0;
+
+			if (result.WhiteSpace == 1)
+			{
+				// whitespace only skip it.
+			}
+			else
+			{
+				Char endsWith = comment.Text[comment.Text.Length - 1];
+
+				if (endsWith == ';')
+				{
+					score += 10;
+				}
+				else if (endsWith == '.')
+				{
+					// c# lines (in general) shouldn't end with a period.
+					score -= 5;
+				}
+
+				if (result.WhiteSpace > 0.5)
+				{
+					score += 5;
+				}
+
+				if (result.Letters > 0.8)
+				{
+					score -= 5;
+				}
+
+				if (result.Punctuation > 0.3)
+				{
+					score += 3;
+				}
+			}
+
+			return score;
 		}
 
 		private bool ValidateOptions()
@@ -173,7 +246,7 @@ namespace CommentCleaner
 
 			if (string.IsNullOrEmpty(_language))
 			{
-				_error.WriteLine("--directory is required.");
+				_error.WriteLine("--language is required.");
 				valid = false;
 			}
 

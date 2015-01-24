@@ -6,10 +6,7 @@ namespace CommentCleaner.Languages.csharp.rules
 	{
 		public override void Evaluate(Comment comment)
 		{
-			unsafe
-			{
-				
-			}
+			// todo: make stats for this.
 		}
 	}
 }

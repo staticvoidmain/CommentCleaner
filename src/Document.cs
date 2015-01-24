@@ -8,7 +8,6 @@ namespace CommentCleaner
 	public sealed class Document
 	{
 		public string FileName { get; private set; }
-		public List<Comment> Comments { get; private set; }
 
 		private int lineCount;
 		private readonly StringBuilder commentBuffer = new StringBuilder(256);
@@ -30,30 +29,22 @@ namespace CommentCleaner
 
 		internal void MarkCommentBegin()
 		{
-			if (commentBegin != -1)
-			{
-				Debugger.Launch();
-			}
-
 			commentBegin = lineCount;
 		}
 
-		internal void MarkCommentEnd()
+		internal Comment CloseComment()
 		{
-			if (this.Comments == null)
-			{
-				this.Comments = new List<Comment>();
-			}
-
-			this.Comments.Add(new Comment()
+			var comment = new Comment()
 			{
 				Text = commentBuffer.ToString(),
 				Start = commentBegin,
 				End = lineCount
-			});
+			};
 
 			commentBuffer.Clear();
 			commentBegin = -1;
+
+			return comment;
 		}
 
 		internal void AppendChar(char c)

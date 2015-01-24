@@ -4,7 +4,7 @@ CommandLine removal of commented code.
 
 ========
 
-Originated as a side project but I thought it was useful to a larger audience, so I decided to black-box implement my own idea and open-source the result. 
+Originated as a side project but I thought it was useful to a larger audience.
 
 Commented code is a blight on large code bases, so lets kill it.
 

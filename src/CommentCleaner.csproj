@@ -44,6 +44,7 @@
     <Compile Include="Languages\csharp\CSharpLanguage.cs" />
     <Compile Include="Languages\csharp\CSharpParser.cs" />
     <Compile Include="Languages\csharp\rules\TokenFrequenyRule.cs" />
+    <Compile Include="TextAnalyzer.cs" />
     <Compile Include="Languages\Language.cs" />
     <Compile Include="Languages\LanguageFactory.cs" />
     <Compile Include="Languages\LanguageRule.cs" />
