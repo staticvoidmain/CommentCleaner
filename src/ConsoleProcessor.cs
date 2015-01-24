@@ -156,7 +156,7 @@ namespace CommentCleaner
 												{
 													lock (_out)
 													{
-														_out.WriteLine(comment.Text + " Score: " + score.ToString());
+														_out.WriteLine(string.Format("{0} [{1}-{2}]: {3}", comment.File, comment.Start, comment.End, comment.Text));
 													}
 												}
 											});
