@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
+﻿using System.Text;
 
 namespace CommentCleaner
 {
@@ -36,6 +33,7 @@ namespace CommentCleaner
 		{
 			var comment = new Comment()
 			{
+				File = this.FileName,
 				Text = commentBuffer.ToString(),
 				Start = commentBegin,
 				End = lineCount

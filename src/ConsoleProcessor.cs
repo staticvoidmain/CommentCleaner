@@ -107,6 +107,11 @@ namespace CommentCleaner
 								}
 							}
 
+							lock (_out)
+							{
+								_out.WriteLine("Added {0} files to be processed.", index);
+							}
+
 							done = true;
 						});
 
