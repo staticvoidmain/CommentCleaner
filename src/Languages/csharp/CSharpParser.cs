@@ -17,6 +17,7 @@ namespace CommentCleaner.Languages
 		private const int LITERAL_ESCAPE_SEQUENCE = 8;
 		private const int AWAITING_BLOCK_COMMENT_COMPLETION = 9;
 		private const int VERBATIM_ESCAPE_QUOTE = 10;
+		private const int CHAR_LITERAL_ESCAPE = 11;
 
 		public override void ParseChunk(Document document, char[] block, Action<Comment> onComment)
 		{
@@ -106,7 +107,6 @@ namespace CommentCleaner.Languages
 							{
 								if (c == '\n')
 								{
-									// edge: line consisting of only a comment.
 									onComment(document.CloseComment());
 									document.IncrementLineCount();
 									state = PARSING;
@@ -149,6 +149,18 @@ namespace CommentCleaner.Languages
 								break;
 
 							case CHAR_LITERAL:
+								switch (c)
+								{
+									case '\'': state = PARSING; break;
+									case '\\': state = CHAR_LITERAL_ESCAPE; break;
+								} break;
+
+							case CHAR_LITERAL_ESCAPE:
+								// this is a more complicated case, but I don't really
+								// feel like implementing this.
+								state = CHAR_LITERAL;
+								break;
+
 							default: throw new ApplicationException();
 						}
 					}

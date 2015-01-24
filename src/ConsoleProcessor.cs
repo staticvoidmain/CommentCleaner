@@ -91,7 +91,7 @@ namespace CommentCleaner
 						const int bufferSize = 1024 * 8;
 						bool done = false;
 						const int parserThreads = 8;
-						ConcurrentQueue<string>[] buckets = InitializeQueueTiles(parserThreads);
+						ConcurrentQueue<string>[] buckets = InitializeConcurrentQueueTiles(parserThreads);
 
 						var producer = Task.Factory.StartNew(() =>
 						{
@@ -187,7 +187,7 @@ namespace CommentCleaner
 			_out.Flush();
 		}
 
-		private static ConcurrentQueue<string>[] InitializeQueueTiles(int tiles)
+		private static ConcurrentQueue<string>[] InitializeConcurrentQueueTiles(int tiles)
 		{
 			ConcurrentQueue<string>[] buckets = new ConcurrentQueue<string>[tiles];
 
